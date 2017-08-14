@@ -8,8 +8,6 @@ services:
       gateway:
         aliases:
           - dynamodb_local_admin
-    environment:
-      - DYNAMODB_LOCAL_ARGS=-dbPath /var/lib/dynamodb
   local_mem:
     extends: local
     environment:

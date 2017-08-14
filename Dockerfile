@@ -80,4 +80,6 @@ ENV VIRTUAL_PORT 8000
 # Main proxy on 8000, dynamo-admin on 8001, dynamodb on 8002
 EXPOSE 8000 8001 8002
 
+ENV DYNAMODB_LOCAL_ARGS "-dbPath /var/lib/dynamodb"
+
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf", "-e", "debug"]
