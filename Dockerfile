@@ -64,7 +64,6 @@ RUN cd /usr/lib && \
 RUN mkdir -p /var/lib/dynamodb
 VOLUME /var/lib/dynamodb
 
-
 COPY nginx-proxy.conf /etc/nginx-proxy.conf
 COPY supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /var/log/supervisord
