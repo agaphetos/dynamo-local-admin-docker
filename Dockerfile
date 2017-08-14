@@ -47,17 +47,23 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 ## END COPY
 ################################################################################
 
-RUN npm install -g dynamodb-admin
+RUN apt-get update && \
+    apt-get install -y git supervisor nginx && \
+    apt-get clean && \
+    rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN npm install -g bower
+
+RUN npm install -g dynamodb-admin --ignore-scripts
+
+RUN cd /usr/local/lib/node_modules/dynamodb-admin && \
+    bower install --allow-root
 
 RUN cd /usr/lib && \
     curl -L https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz | tar xz
 RUN mkdir -p /var/lib/dynamodb
 VOLUME /var/lib/dynamodb
 
-RUN apt-get update && \
-    apt-get install -y supervisor nginx && \
-    apt-get clean && \
-    rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY nginx-proxy.conf /etc/nginx-proxy.conf
 COPY supervisord.conf /etc/supervisord.conf
@@ -65,6 +71,8 @@ RUN mkdir -p /var/log/supervisord
 
 # Configuration for dynamo-admin to know where to hit dynamo.
 ENV DYNAMO_ENDPOINT http://localhost:8002/
+ENV AWS_ACCESS_KEY_ID accessKey
+ENV AWS_SECRET_ACCESS_KEY secret
 
 # For dinghy users.
 ENV VIRTUAL_HOST dynamo.docker
@@ -73,4 +81,4 @@ ENV VIRTUAL_PORT 8000
 # Main proxy on 8000, dynamo-admin on 8001, dynamodb on 8002
 EXPOSE 8000 8001 8002
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf", "-e", "debug"]

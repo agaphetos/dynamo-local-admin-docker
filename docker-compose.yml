@@ -1,0 +1,21 @@
+version: '2'
+services:
+  local:
+    build: .
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 8002:8002
+    networks:
+      gateway:
+        aliases:
+          - dynamodb_local_admin
+    environment:
+      - DYNAMODB_LOCAL_ARGS=-dbPath /var/lib/dynamodb
+  local_mem:
+    extends: local
+    environment:
+      - DYNAMODB_LOCAL_ARGS=-inMemory
+networks:
+  gateway:
+    external: true 
