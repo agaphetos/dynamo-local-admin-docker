@@ -13,8 +13,8 @@ docker run -e "DYNAMODB_LOCAL_ARGS=-inMemory" -p 8000:8000 -it --rm kinyat/dynam
 
 ### Docker-compose
 ```
-docker up local # presist changes
-docker up local_mem # Memory only
+docker-compose up local # presist changes
+docker-compose up local_mem # Memory only
 ```
 
 Now open http://localhost:8000/ in your browser, and you'll see the admin UI. You can also hit port 8000 with Dynamo API requests:
