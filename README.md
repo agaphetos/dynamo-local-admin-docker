@@ -4,9 +4,17 @@ This project builds a Docker image with [DynamoDB Local](http://docs.aws.amazon.
 
 ## Usage
 
+### Docker
 ```
-docker pull instructure/dynamo-local-admin
-docker run -p 8000:8000 -it --rm instructure/dynamo-local-admin
+docker pull kinyat/dynamo-local-admin-docker
+docker run -p 8000:8000 -it --rm kinyat/dynamo-local-admin-docker # presist changes
+docker run -e "DYNAMODB_LOCAL_ARGS=-inMemory" -p 8000:8000 -it --rm kinyat/dynamo-local-admin-docker # Memory only
+```
+
+### Docker-compose
+```
+docker up local # presist changes
+docker up local_mem # Memory only
 ```
 
 Now open http://localhost:8000/ in your browser, and you'll see the admin UI. You can also hit port 8000 with Dynamo API requests:
