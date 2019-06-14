@@ -2,7 +2,8 @@
 # in all the alpine java images.
 FROM openjdk:8-jre
 
-MAINTAINER Zach Wily <zach@instructure.com>
+LABEL maintainer="Zach Wily <zach@instructure.com>"
+LABEL maintainer="Levin Calado <levincalado@gmail.com>"
 
 # We need java and node in this image, so we'll start with java (cause it's
 # more hairy), and then dump in the node Dockerfile below. It'd be nice if there
@@ -19,7 +20,7 @@ MAINTAINER Zach Wily <zach@instructure.com>
 ##
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.4.0
+ENV NODE_VERSION 8.16.0
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
   && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -35,12 +36,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN npm install -g bower
-
 RUN npm install -g dynamodb-admin --ignore-scripts
 
 RUN cd /usr/local/lib/node_modules/dynamodb-admin && \
-    bower install --allow-root
+    npm install --allow-root
 
 RUN cd /usr/lib && \
     curl -L https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz | tar xz
@@ -49,10 +48,11 @@ VOLUME /var/lib/dynamodb
 
 COPY nginx-proxy.conf /etc/nginx-proxy.conf
 COPY supervisord.conf /etc/supervisord.conf
+COPY .htpasswd /etc/nginx/.htpasswd
 RUN mkdir -p /var/log/supervisord
 
 # Configuration for dynamo-admin to know where to hit dynamo.
-ENV DYNAMO_ENDPOINT http://localhost:8002/
+ENV DYNAMO_ENDPOINT http://localhost:8000/
 ENV AWS_ACCESS_KEY_ID accessKey
 ENV AWS_SECRET_ACCESS_KEY secret
 
@@ -60,8 +60,8 @@ ENV AWS_SECRET_ACCESS_KEY secret
 ENV VIRTUAL_HOST dynamo.docker
 ENV VIRTUAL_PORT 8000
 
-# Main proxy on 8000, dynamo-admin on 8001, dynamodb on 8002
-EXPOSE 8000 8001 8002
+# Main proxy on 9000, dynamo-admin on 80/80, dynamodb on 8000
+EXPOSE 8000 8080 9000
 
 ENV DYNAMODB_LOCAL_ARGS "-dbPath /var/lib/dynamodb"
 
